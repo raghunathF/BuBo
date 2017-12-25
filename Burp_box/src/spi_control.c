@@ -10,6 +10,11 @@
 #include "delay.h"
 #include "bsp.h"
 
+void spi_write_global_erase()
+{
+	spi_transceive(wr_buffer_global_erase , rd_buffer , BUF_LENGTH);
+}
+
 void spi_write_reset()
 {
 	spi_transceive(wr_buffer_reset , rd_buffer , BUF_LENGTH);
@@ -62,14 +67,48 @@ void init_burp_box()
 	track_pointer = 1;
 }
 
-void wait_burp_box()
+void wait_burp_box_2()
 {
 	bool burp_box_busy = false;
+	int count_delay= 0;
+	interrupt_occured = false;
 	while(burp_box_busy != true /*&& time_out != true*/ && interrupt_occured !=true )
 	{
 		delay_spi();
-		spi_transceive( wr_buffer_status_pointer , rd_buffer_3 ,BUF_LENGTH_4);
-		burp_box_busy = rd_buffer_3[1] & 0x10;
+		count_delay++;
+		if(count_delay > 16*3)
+		{
+			burp_box_busy = true;
+			count_delay = 0;
+		}
+	}
+	spi_write_stop();
+}
+
+void wait_burp_box(uint8_t operation)
+{
+	bool burp_box_busy = true;
+	interrupt_occured = false;
+	while(burp_box_busy == true /*&& time_out != true*/ && interrupt_occured !=true )
+	{
+		delay_cycles_ms(200);
+		spi_transceive( wr_buffer_status_pointer , rd_buffer_3 ,BUF_LENGTH_3);
+		switch(operation)
+		{
+			case RECORD_OPERATION:
+				burp_box_busy = rd_buffer_3[2] & RECORD_READY_MASK;
+				break;
+				
+			case PLAY_OPERATION:
+				burp_box_busy = rd_buffer_3[2] & PLAY_READY_MASK;
+				break;
+			case ERASE_OPERATION:
+				burp_box_busy = rd_buffer_3[2] & ERASE_READY_MASK;
+				break;
+			default:
+			    break;
+		}
+		
 	}
 	spi_write_stop();
 }
@@ -90,20 +129,49 @@ void burp_box_record(uint8_t track_no)
 			break;
 		
 		case TRACK_NO_3:
-			spi_transceive( wr_buffer_record_set_2 , rd_buffer_6 ,BUF_LENGTH_6);
+		
+			spi_transceive( wr_buffer_record_set_3 , rd_buffer_6 ,BUF_LENGTH_6);
 			break;
 		
 		default:
 			break;
 	}
 	//Wait till the operation is complete
-	wait_burp_box();
 	
+	//wait_burp_box_2();
+	wait_burp_box(RECORD_OPERATION);
+	
+}
+
+void burp_box_erase(uint8_t track_no)
+{
+	switch(track_no)
+	{
+		case TRACK_NO_1:
+		     spi_transceive( wr_buffer_erase_set_1 , rd_buffer_6 ,BUF_LENGTH_6);
+			 break;
+			 
+		case TRACK_NO_2:
+			 spi_transceive( wr_buffer_erase_set_2 , rd_buffer_6 ,BUF_LENGTH_6);
+			 break;
+			 
+	    case TRACK_NO_3:
+			spi_transceive( wr_buffer_erase_set_3 , rd_buffer_6 ,BUF_LENGTH_6);
+			 break;
+			 
+		default:
+			 break;
+	}
+	//wait_burp_box_2();
+	wait_burp_box(ERASE_OPERATION);
+	//delay_cycles_ms(300);
 }
 
 void burp_box_play(uint8_t track_no)
 {
 	//time_out = false;
+	//Clear interrupts
+	spi_write_clear_int();
 	switch (track_no)
 	{
 		
@@ -114,7 +182,7 @@ void burp_box_play(uint8_t track_no)
 			
 		case TRACK_NO_2:
 		
-			spi_transceive( wr_buffer_play_set_3 , rd_buffer_6 ,BUF_LENGTH_6);
+			spi_transceive( wr_buffer_play_set_2 , rd_buffer_6 ,BUF_LENGTH_6);
 			//Wait till the operation is complete
 			break;
 			
@@ -128,7 +196,57 @@ void burp_box_play(uint8_t track_no)
 	}
 	
 	//Wait till the operation is complete
-	wait_burp_box();
+	//LED_on(PLAY_LED);
+	wait_burp_box(PLAY_OPERATION);
+}
+
+
+
+
+
+void global_erase_LED_flashing()
+{
+	int i =0;
+	int j =0;
+	
+	for(j=0;j<LOOP_2;j++)
+	{
+		for(i=LOOP_1_START;i<LOOP_1_END;i = i+2)
+		{
+			LED_off(PLAY_LED);
+			LED_off(RECORD_LED);
+			delay_cycles_us(i);
+			LED_on(RECORD_LED);
+			LED_on(PLAY_LED);
+			delay_cycles_us(LOOP_1_END-i);
+		}
+	}
+	LED_off(PLAY_LED);
+	LED_off(RECORD_LED);
+}
+
+
+void burp_box_global_erase()
+{
+	bool burp_box_busy = true;
+	LED_on(PLAY_LED);
+	LED_on(RECORD_LED);
+	
+	spi_write_global_erase();
+	
+	while(burp_box_busy == true)
+	{
+		delay_cycles_ms(200);
+		spi_transceive( wr_buffer_status_pointer , rd_buffer_3 ,BUF_LENGTH_3);
+		burp_box_busy = rd_buffer_3[2] & ERASE_READY_MASK;
+	}
+	
+	spi_write_stop();
+	
+	LED_off(PLAY_LED);
+	LED_off(RECORD_LED);
+	//2 Seconds
+	global_erase_LED_flashing();
 }
 
 void spi_main_loop_1(uint16_t input_buttons_servo)
@@ -137,8 +255,8 @@ void spi_main_loop_1(uint16_t input_buttons_servo)
 	{	
 		case IDEAL_STATE:
 			break;
-		case PLAY_BUTTON_PRESSED:
 		
+		case PLAY_BUTTON_PRESSED:
 			spi_write_stop();
 			LED_on(PLAY_LED);
 			spi_write_apc(wr_apc_2_play_memory);
@@ -146,16 +264,19 @@ void spi_main_loop_1(uint16_t input_buttons_servo)
 			burp_box_play(track_pointer);
 			LED_off(PLAY_LED);
 			spi_write_apc(wr_apc_2_ideal);
+			interrupt_occured = false;
 			break;
 			
 		case RECORD_BUTTON_PRESSED:
-		
+			spi_write_stop();
+			burp_box_erase(track_pointer);
 			spi_write_stop();
 			LED_on(RECORD_LED);
 			spi_write_apc(wr_apc_2_record_mic);
 			burp_box_record(track_pointer);
 			LED_off(RECORD_LED);
 			spi_write_apc(wr_apc_2_ideal);
+			interrupt_occured = false;
 			break;
 		
 		case NEXT_BUTTON_PRESSED:
@@ -165,10 +286,49 @@ void spi_main_loop_1(uint16_t input_buttons_servo)
 			{
 				track_pointer = 1;
 			}
-			LED_track(track_pointer);
+			LED_track(track_pointer-1);
+			interrupt_occured = false;
 			break;
-		
+		case N_P_PRESSED:
+			spi_write_stop();
+			track_pointer = TRACK_NO_1;
+			burp_box_global_erase();
+			global_erase_LED_flashing();
+			LED_track(track_pointer-1);
+			interrupt_occured = false;
 		default:
 			break;
 	}
+}
+
+void change_volume(uint8_t volume)
+{
+
+	switch (volume)
+	{
+		case VOLUME_1:
+		spi_write_apc(wr_apc_2_volume_1);
+		break;
+		case VOLUME_2:
+		spi_write_stop();
+		spi_write_apc(wr_apc_2_volume_2);
+		break;
+		case VOLUME_3:
+		spi_write_apc(wr_apc_2_volume_3);
+		break;
+		case VOLUME_4:
+		spi_write_apc(wr_apc_2_volume_4);
+		break;
+		case VOLUME_5:
+		spi_write_apc(wr_apc_2_volume_5);
+		break;
+		default:
+		break;
+	}
+}
+
+void burp_box_set_volume_track(uint8_t volume,uint8_t track_no)
+{
+	change_volume(volume);
+	burp_box_play(track_no);
 }

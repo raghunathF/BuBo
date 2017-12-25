@@ -8,6 +8,8 @@ src\ASF\sam0\drivers\extint\extint_sam_d_r_h\extint.c
 
 src\buttons.c
 
+src\PWM_capture_control.c
+
 src\main_control.c
 
 src\spi_control.c

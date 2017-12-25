@@ -149,8 +149,8 @@ void next_pressed_callback()
 			input_buttons = N_PRESS;
 			break;
 		case ALL_BUTTONS_CLICKED:
-			//global variable update
-			input_buttons = N_P_R_PRESS;
+				//global variable update
+				input_buttons = N_P_PRESS;
 			break;
 		default:
 			input_buttons = NO_BUTTONS_PRESSED;

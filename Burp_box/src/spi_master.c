@@ -8,6 +8,7 @@
 #include "spi_master.h"
 #include "pinout.h"
 #include "bsp.h"
+#include "spi_control.h"
 
 volatile bool transrev_complete_spi_master = false;
 
@@ -60,12 +61,13 @@ void configure_spi(void)
 
 void spi_transceive (uint8_t* wr_buffer , uint8_t* rd_buffer ,uint8_t buff_length)
 {
-	//spi_select_slave(&spi_master_instance, &slave, false);
 	spi_select_slave(&spi_master_instance, &slave, true);
 	spi_transceive_buffer_job(&spi_master_instance, wr_buffer ,rd_buffer , buff_length);
 	while (!transrev_complete_spi_master)
 	{
 	}
+	transrev_complete_spi_master = false;
+	spi_select_slave(&spi_master_instance, &slave, false);
 }
 /*
 #define BUF_LENGTH  2 
@@ -99,10 +101,10 @@ static uint8_t rd_buffer_6[BUF_LENGTH_6];
 static uint8_t rd_buffer_3[BUF_LENGTH_3];
 */
 //! [buffer]
-/*
+
 void speaker_test()
 {
-	
+			/*
 	        //--Find the device ID
 			spi_select_slave(&spi_master_instance, &slave, true);
 			spi_transceive_buffer_job(&spi_master_instance,  wr_buffer_dev_id,rd_buffer_3,BUF_LENGTH_3);
@@ -112,7 +114,8 @@ void speaker_test()
 			transrev_complete_spi_master = false;
 			spi_select_slave(&spi_master_instance, &slave, false);
 			delay_cycles_ms(200);
-			
+			*/
+			/*
 			//--Reset
 			spi_select_slave(&spi_master_instance, &slave, true);
 			spi_transceive_buffer_job(&spi_master_instance, wr_buffer_reset,rd_buffer,BUF_LENGTH);
@@ -122,6 +125,7 @@ void speaker_test()
 			transrev_complete_spi_master = false;
 			spi_select_slave(&spi_master_instance, &slave, false);
 			delay_cycles_ms(200);
+			
 			
 			//--Power-on the SPI
 			spi_select_slave(&spi_master_instance, &slave, true);
@@ -147,7 +151,7 @@ void speaker_test()
 			
 			//--Write APC-2
 			spi_select_slave(&spi_master_instance, &slave, true);
-			spi_transceive_buffer_job(&spi_master_instance, wr_apc_2, rd_buffer_4,BUF_LENGTH_3);
+			spi_transceive_buffer_job(&spi_master_instance, wr_apc_2_ideal, rd_buffer_4,BUF_LENGTH_3);
 			while (!transrev_complete_spi_master)
 			{
 			}
@@ -155,7 +159,7 @@ void speaker_test()
 			spi_select_slave(&spi_master_instance, &slave, false);
 			delay_cycles_ms(200);
 			
-			
+			/*
 			//--Read APC
 			spi_select_slave(&spi_master_instance, &slave, true);
 			spi_transceive_buffer_job(&spi_master_instance, rd_apc, rd_buffer_4,BUF_LENGTH_4);
@@ -179,6 +183,7 @@ void speaker_test()
 			spi_select_slave(&spi_master_instance, &slave, false);
 		    delay_cycles_ms(200);
 			
+			*/
 			
 			//--Clear INIT
 			spi_select_slave(&spi_master_instance, &slave, true);
@@ -191,6 +196,7 @@ void speaker_test()
 			
 			
 			delay_cycles_ms(200);
+			/*
 			//Check the record pointer
 			spi_select_slave(&spi_master_instance, &slave, true);
 			spi_transceive_buffer_job(&spi_master_instance, wr_buffer_rec_pointer,rd_buffer_4,BUF_LENGTH_4);
@@ -200,6 +206,7 @@ void speaker_test()
 			transrev_complete_spi_master = false;
 			spi_select_slave(&spi_master_instance, &slave, false);
 			
+			*/
 			/*
 			//--Record for sometime 
 			spi_select_slave(&spi_master_instance, &slave, true);
@@ -210,18 +217,18 @@ void speaker_test()
 			transrev_complete_spi_master = false;
 			spi_select_slave(&spi_master_instance, &slave, false);
 			*/
-			/*
+			
 			//--Record-2
 			delay_cycles_ms(200);
 			spi_select_slave(&spi_master_instance, &slave, true);
-			spi_transceive_buffer_job(&spi_master_instance, wr_buffer_record_2,rd_buffer_6,BUF_LENGTH_6);
+			spi_transceive_buffer_job(&spi_master_instance, wr_buffer_record_set_1,rd_buffer_6,BUF_LENGTH_6);
 			while (!transrev_complete_spi_master)
 			{
 			}
 			transrev_complete_spi_master = false;
 			spi_select_slave(&spi_master_instance, &slave, false);
 			
-			//Wait for 2 seconds 
+			//Wait for 12 seconds 
 			delay_cycles_ms(6000);
 			
 			
@@ -235,7 +242,9 @@ void speaker_test()
 			transrev_complete_spi_master = false;
 			spi_select_slave(&spi_master_instance, &slave, false);
 			
+			
 			/*
+			
 			delay_ms(100);
 			//Check the record pointer
 			spi_select_slave(&spi_master_instance, &slave, true);
@@ -257,11 +266,11 @@ void speaker_test()
 			spi_select_slave(&spi_master_instance, &slave, false);
 			
 			*/			
-			//delay_cycles_ms(300);
-			/*
+			delay_cycles_ms(300);
+			
 			//Play the recorded
 			spi_select_slave(&spi_master_instance, &slave, true);
-			spi_transceive_buffer_job(&spi_master_instance, wr_buffer_play_2,rd_buffer_6,BUF_LENGTH_6);
+			spi_transceive_buffer_job(&spi_master_instance, wr_buffer_play_set_1,rd_buffer_6,BUF_LENGTH_6);
 			while (!transrev_complete_spi_master)
 			{
 			}
@@ -280,7 +289,7 @@ void speaker_test()
 			spi_select_slave(&spi_master_instance, &slave, false);
 			delay_cycles_ms(200);
 			*/
-			/*
+		
 			delay_cycles_ms(6000);
 			
 			//--Send stop command
@@ -293,4 +302,3 @@ void speaker_test()
 			spi_select_slave(&spi_master_instance, &slave, false);
 				
 }
-*/

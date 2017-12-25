@@ -46,6 +46,6 @@ struct tc_module tc_instance1;
 #define TIMER_MULTIPLIER_9     TIMER_MULTIPLIER*9
 #define TIMER_MULTIPLIER_10    TIMER_MULTIPLIER*10
 
-enum buttons_state{ NO_BUTTONS_PRESSED=0, N_PRESS=1, R_PRESS=2,P_PRESS=3 , N_R_PRESS=4,N_P_PRESS=5,R_P_PRESS=6,N_P_R_PRESS =7 }; 
+enum buttons_state{ NO_BUTTONS_PRESSED=0, N_PRESS=1, R_PRESS=2,P_PRESS=3 , N_R_PRESS=5,N_P_PRESS=4,R_P_PRESS=6,N_P_R_PRESS =7 }; 
 
 #endif /* BSP_H_ */

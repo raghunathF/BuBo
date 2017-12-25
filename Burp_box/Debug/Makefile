@@ -109,6 +109,7 @@ C_SRCS +=  \
 ../src/ASF/sam0/drivers/extint/extint_callback.c \
 ../src/ASF/sam0/drivers/extint/extint_sam_d_r_h/extint.c \
 ../src/buttons.c \
+../src/PWM_capture_control.c \
 ../src/main_control.c \
 ../src/spi_control.c \
 ../src/test.c \
@@ -147,6 +148,7 @@ OBJS +=  \
 src/ASF/sam0/drivers/extint/extint_callback.o \
 src/ASF/sam0/drivers/extint/extint_sam_d_r_h/extint.o \
 src/buttons.o \
+src/PWM_capture_control.o \
 src/main_control.o \
 src/spi_control.o \
 src/test.o \
@@ -178,6 +180,7 @@ OBJS_AS_ARGS +=  \
 src/ASF/sam0/drivers/extint/extint_callback.o \
 src/ASF/sam0/drivers/extint/extint_sam_d_r_h/extint.o \
 src/buttons.o \
+src/PWM_capture_control.o \
 src/main_control.o \
 src/spi_control.o \
 src/test.o \
@@ -209,6 +212,7 @@ C_DEPS +=  \
 src/ASF/sam0/drivers/extint/extint_callback.d \
 src/ASF/sam0/drivers/extint/extint_sam_d_r_h/extint.d \
 src/buttons.d \
+src/PWM_capture_control.d \
 src/main_control.d \
 src/spi_control.d \
 src/test.d \
@@ -240,6 +244,7 @@ C_DEPS_AS_ARGS +=  \
 src/ASF/sam0/drivers/extint/extint_callback.d \
 src/ASF/sam0/drivers/extint/extint_sam_d_r_h/extint.d \
 src/buttons.d \
+src/PWM_capture_control.d \
 src/main_control.d \
 src/spi_control.d \
 src/test.d \
@@ -282,6 +287,8 @@ LINKER_SCRIPT_DEP+=  \
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

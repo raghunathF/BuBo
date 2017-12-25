@@ -1,4 +1,5 @@
-src/spi_master.d src/spi_master.o: ../src/spi_master.c ../src/asf.h \
+src/PWM_capture_control.d src/PWM_capture_control.o: \
+ ../src/PWM_capture_control.c ../src/asf.h \
  ../src/ASF/sam0/utils/compiler.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\lib\gcc\arm-none-eabi\6.2.1\include\stddef.h \
  ../src/ASF/common/utils/parts.h ../src/ASF/sam0/utils/status_codes.h \
@@ -126,8 +127,8 @@ src/spi_master.d src/spi_master.o: ../src/spi_master.c ../src/asf.h \
  ../src/ASF/sam0/drivers/tc/tc_interrupt.h \
  ../src/ASF/sam0/drivers/tc/tc.h ../src/ASF/sam0/drivers/tcc/tcc.h \
  ../src/ASF/sam0/drivers/tcc/tcc_callback.h \
- ../src/ASF/sam0/drivers/tcc/tcc.h ../src/pinout.h ../src/spi_master.h \
- ../src/bsp.h ../src/spi_control.h
+ ../src/ASF/sam0/drivers/tcc/tcc.h ../src/pinout.h \
+ ../src/PWM_capture_control.h ../src/spi_control.h
 
 ../src/asf.h:
 
@@ -399,8 +400,6 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 
 ../src/pinout.h:
 
-../src/spi_master.h:
-
-../src/bsp.h:
+../src/PWM_capture_control.h:
 
 ../src/spi_control.h:

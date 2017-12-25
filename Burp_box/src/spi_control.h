@@ -8,11 +8,19 @@
 #include <asf.h>
 
 //void init_burp_box();
-
+	
 #define TRACK_NO_1						1
 #define TRACK_NO_2						2
 #define TRACK_NO_3						3
 
+#define RECORD_OPERATION				1
+#define PLAY_OPERATION					2
+#define ERASE_OPERATION					3
+
+#define RECORD_READY_MASK						0x08
+#define PLAY_READY_MASK							0x04
+#define ERASE_READY_MASK						0x02
+#define SPI_READY_MASK							0x01
 
 
 #define BUFFER_RESET_LENGTH				2
@@ -31,8 +39,28 @@
 #define BUF_LENGTH_6 6
 #define BUF_LENGTH_3 3
 #define SLAVE_SELECT_PIN CONF_MASTER_SS_PIN
+//Track --1
+#define START_ADD_1_L		0x10
+#define START_ADD_1_H		0x00
+#define END_ADD_1_L			0x37
+#define END_ADD_1_H			0x00
 
+//Track -2
+#define START_ADD_2_L		0x38
+#define START_ADD_2_H		0x00
+#define END_ADD_2_L			0x5F
+#define END_ADD_2_H			0x00
 
+//Track --3
+#define START_ADD_3_L		0x60
+#define START_ADD_3_H		0x00
+#define END_ADD_3_L			0x87
+#define END_ADD_3_H			0x00
+
+//LED Flasing -- Global Erase
+#define LOOP_2 3
+#define LOOP_1_START 200
+#define LOOP_1_END   800
 
 static uint8_t rd_buffer[BUF_LENGTH];
 static uint8_t rd_buffer_4[BUF_LENGTH_4];
@@ -51,17 +79,30 @@ static uint8_t wr_buffer_stop[BUF_LENGTH]         = { 0x02,0x00 };
 
 //Record
 static uint8_t wr_buffer_record[BUF_LENGTH]       = { 0x41,0x00 };
+	
 //Record-set
-static uint8_t wr_buffer_record_set_1[BUF_LENGTH_6] = { 0x81,0x00,0x15,0x00,0xE0,0x00 };
-static uint8_t wr_buffer_record_set_2[BUF_LENGTH_6] = { 0x81,0x00,0x15,0x00,0xE0,0x00 };
-static uint8_t wr_buffer_record_set_3[BUF_LENGTH_6] = { 0x81,0x00,0x15,0x00,0xE0,0x00 };
+static uint8_t wr_buffer_record_set_1[BUF_LENGTH_6] = { 0x81,0x00,START_ADD_1_L,START_ADD_1_H,END_ADD_1_L,END_ADD_1_H };
+static uint8_t wr_buffer_record_set_2[BUF_LENGTH_6] = { 0x81,0x00,START_ADD_2_L,START_ADD_2_H,END_ADD_2_L,END_ADD_2_H  };
+static uint8_t wr_buffer_record_set_3[BUF_LENGTH_6] = { 0x81,0x00,START_ADD_3_L,START_ADD_3_H,END_ADD_3_L,END_ADD_3_H  };
 
 //Play
 static uint8_t wr_buffer_play[BUF_LENGTH]         = { 0x40,0x00 };
 //Play-set
-static uint8_t wr_buffer_play_set_1[BUF_LENGTH_6]   = { 0x80,0x00,0x15,0x00,0xE0,0x00 };
-static uint8_t wr_buffer_play_set_2[BUF_LENGTH_6]   = { 0x80,0x00,0x15,0x00,0xE0,0x00 };
-static uint8_t wr_buffer_play_set_3[BUF_LENGTH_6]   = { 0x80,0x00,0x15,0x00,0xE0,0x00 };
+static uint8_t wr_buffer_play_set_1[BUF_LENGTH_6]   = { 0x80,0x00,START_ADD_1_L,START_ADD_1_H,END_ADD_1_L,END_ADD_1_H };
+static uint8_t wr_buffer_play_set_2[BUF_LENGTH_6]   = { 0x80,0x00,START_ADD_2_L,START_ADD_2_H,END_ADD_2_L,END_ADD_2_H };
+static uint8_t wr_buffer_play_set_3[BUF_LENGTH_6]   = { 0x80,0x00,START_ADD_3_L,START_ADD_3_H,END_ADD_3_L,END_ADD_3_H };
+
+//Erase
+static uint8_t wr_buffer_erase[BUF_LENGTH]           = { 0x42,0x00 };
+//Erase-set
+static uint8_t wr_buffer_erase_set_1[BUF_LENGTH_6]   = { 0x82,0x00,START_ADD_1_L,START_ADD_1_H,END_ADD_1_L,END_ADD_1_H };
+static uint8_t wr_buffer_erase_set_2[BUF_LENGTH_6]   = { 0x82,0x00,START_ADD_2_L,START_ADD_2_H,END_ADD_2_L,END_ADD_2_H };
+static uint8_t wr_buffer_erase_set_3[BUF_LENGTH_6]   = { 0x82,0x00,START_ADD_3_L,START_ADD_3_H,END_ADD_3_L,END_ADD_3_H };
+//Global Erase
+static uint8_t wr_buffer_global_erase[BUF_LENGTH]    = { 0x43,0x00 };
+
+
+
 
 //APC --write
 static uint8_t wr_apc_2_ideal[BUF_LENGTH_3] = { 0x65,0x40,0x04 };
@@ -72,6 +113,12 @@ static uint8_t wr_apc_2_record_mic[BUF_LENGTH_3] = {0x65,0x41,0x04};
 static uint8_t wr_apc_2_record_analogIn[BUF_LENGTH_3] = {0x65,0x01,0x04};
 
 
+//APC--Change Volume 
+static uint8_t wr_apc_2_volume_5[BUF_LENGTH_3] = { 0x65,0x40,0x04 };
+static uint8_t wr_apc_2_volume_4[BUF_LENGTH_3] = { 0x65,0x43,0x04 };
+static uint8_t wr_apc_2_volume_3[BUF_LENGTH_3] = { 0x65,0x45,0x04 };
+static uint8_t wr_apc_2_volume_2[BUF_LENGTH_3] = { 0x65,0x46,0x04 };
+static uint8_t wr_apc_2_volume_1[BUF_LENGTH_3] = { 0x65,0x47,0x04 };
 //Read APC
 static uint8_t rd_apc[BUF_LENGTH_4]               = {0x44,0x00,0x00,0x00};
 //Read Playback pointer
@@ -84,11 +131,12 @@ static uint8_t wr_buffer_dev_id[BUF_LENGTH_3] ={ 0x09,0x00,0x00 };
 static uint8_t wr_buffer_status_pointer[BUF_LENGTH_3] = {0x05,0x00,0x00};
 	
 //Control States
-enum control_states{ IDEAL_STATE = 0, NEXT_BUTTON_PRESSED=1, RECORD_BUTTON_PRESSED=2, PLAY_BUTTON_PRESSED=3}; 
+enum control_states{ IDEAL_STATE = 0, NEXT_BUTTON_PRESSED=1, RECORD_BUTTON_PRESSED=2, PLAY_BUTTON_PRESSED=3,N_P_PRESSED = 4,ALL_BUTTONS_PRESSED = 7}; 
 
 
 extern volatile uint8_t track_pointer; 
 extern volatile bool interrupt_occured;
+
 
 
 void init_burp_box();

@@ -47,22 +47,26 @@ int main (void)
 	delay_init();
 	
 	//Leds and buttons initialization
-	//init_led_buttons();
+	init_led_buttons();
 	
 	//SPI initialization
-	//configure_spi();
+	configure_spi();
 	
 	//Init buttons
 	init_buttons();
 	
 	//Init_burp_box
-	//init_burp_box();
+	init_burp_box();
 	
 	while(1)
 	{
+		//LED_on(PLAY_LED);
 		//speaker_test();
+		//LED_off(PLAY_LED);
+		//delay_cycles_ms(1000);
 		//test_led_on_off_toggle();
-		//test_but	tons();
+		//test_buttons();
+		//test_track_led();
 		main_control_loop_1();
 	}
 	

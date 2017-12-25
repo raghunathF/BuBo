@@ -115,7 +115,7 @@ void init_led_buttons()
 	port_pin_set_output_level(TRACK_LED,false);
 	
 	
-	/*
+	
 	//Switches_init
 	port_get_config_defaults(&config_port_pin);
 	config_port_pin.input_pull = PORT_PIN_PULL_DOWN;
@@ -123,6 +123,7 @@ void init_led_buttons()
 	
 	//Record button init
 	port_pin_set_config(RECORD_BUTTON, &config_port_pin);
+	/*
 	//Play button init
 	port_pin_set_config(PLAY_BUTTON, &config_port_pin);
 	//Next button init
@@ -169,6 +170,49 @@ void LED_track(uint8_t track_no)
 	
 }
 
+uint8_t check_input_buttons(void)
+{
+	enum buttons_state buttons_pressed ;
+	volatile uint32_t in_reg = 0;
+	buttons_pressed = NO_BUTTONS_PRESSED;
+	//Software debounce
+	PortGroup *const port_base = port_get_group_from_gpio_pin(RECORD_LED);
+	
+	in_reg = port_base->IN.reg & MASK_BUTTONS;
+	if( in_reg == NO_BUTTONS_PRESSED)
+	{
+		return buttons_pressed;
+	}
+	else
+	{
+		//check if the button still pressed
+		delay_cycles_ms(125);
+		in_reg = port_base->IN.reg & MASK_BUTTONS;
+		if( in_reg == NO_BUTTONS_PRESSED)
+		{
+			return buttons_pressed;
+		}
+		else
+		{
+			switch(in_reg)
+			{
+				case RECORD_PRESSED:
+					buttons_pressed = R_PRESS;
+					in_reg  = 0;
+					break;
+				default:
+					break;
+			}
+			in_reg = port_base->IN.reg & MASK_BUTTONS;
+			return buttons_pressed;
+		}
+		
+		
+	}
+}
+
+
+/*
 uint8_t check_input_buttons(void)
 {
 	enum buttons_state buttons_pressed ;
@@ -234,3 +278,4 @@ uint8_t check_input_buttons(void)
 	 }
 }
 
+*/

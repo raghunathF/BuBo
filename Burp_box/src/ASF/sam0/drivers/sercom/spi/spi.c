@@ -849,7 +849,7 @@ enum status_code spi_select_slave(
 		struct spi_module *const module,
 		struct spi_slave_inst *const slave,
 		const bool select)
-{
+{ 
 	/* Sanity check arguments */
 	Assert(module);
 	Assert(module->hw);
