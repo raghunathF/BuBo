@@ -67,6 +67,38 @@ static uint8_t rd_buffer_4[BUF_LENGTH_4];
 static uint8_t rd_buffer_6[BUF_LENGTH_6];
 static uint8_t rd_buffer_3[BUF_LENGTH_3];
 
+
+//Servo Pulses
+#define FUTURE_USE 0x0000
+//Play
+#define TRACK_1_VOLUME_1 0x0100
+#define TRACK_1_VOLUME_2 0x0200
+#define TRACK_1_VOLUME_3 0x0300
+#define TRACK_2_VOLUME_1 0x0400
+#define TRACK_2_VOLUME_2 0x0500
+#define TRACK_2_VOLUME_3 0x0600
+#define TRACK_3_VOLUME_1 0x0700
+#define TRACK_3_VOLUME_2 0x0800
+#define TRACK_3_VOLUME_3 0x0900
+//Record
+#define TRACK_1_RECORD_MIC   0x0A00
+#define TRACK_1_RECORD_ANAIN 0x0B00
+#define TRACK_2_RECORD_MIC   0x0C00
+#define TRACK_2_RECORD_ANAIN 0x0D00
+#define TRACK_3_RECORD_MIC   0x0E00
+#define TRACK_3_RECORD_ANAIN 0x0F00
+//FeedThrough
+#define FT_MIC   0x1000
+#define FT_ANAIN 0x1100
+//Help 
+#define REPEAT_HELP 0x1200
+#define UNDEFINED 0x1400
+
+#define TRACK_1 1
+#define TRACK_2 2
+#define TRACK_3 3
+
+
 //Initialization
 static uint8_t wr_buffer_reset[BUF_LENGTH]     =  {	0x03,0x00 };
 static uint8_t wr_buffer_clr_init[BUF_LENGTH]  = { 0x04,0x00 };
@@ -109,8 +141,10 @@ static uint8_t wr_apc_2_ideal[BUF_LENGTH_3] = { 0x65,0x40,0x04 };
 static uint8_t wr_apc_2_play_memory[BUF_LENGTH_3] = { 0x65,0x40,0x04 };
 static uint8_t wr_apc_2_play_mic[BUF_LENGTH_3] = { 0x65,0x40,0x04 };
 static uint8_t wr_apc_2_play_analogIn[BUF_LENGTH_3] = { 0x65,0x40,0x04 };
-static uint8_t wr_apc_2_record_mic[BUF_LENGTH_3] = {0x65,0x41,0x04};
-static uint8_t wr_apc_2_record_analogIn[BUF_LENGTH_3] = {0x65,0x01,0x04};
+static uint8_t wr_apc_2_record_mic[BUF_LENGTH_3] = {0x65,0x40,0x04};
+static uint8_t wr_apc_2_record_analogIn[BUF_LENGTH_3] = {0x65,0x07,0x04};
+static uint8_t wr_apc_2_speaker_analogIn[BUF_LENGTH_3] = {0x65,0x00,0x04};
+static uint8_t wr_apc_2_speaker_mic_analogIn[BUF_LENGTH_3] = {0x65,0x13,0x04};
 
 
 //APC--Change Volume 
@@ -131,13 +165,17 @@ static uint8_t wr_buffer_dev_id[BUF_LENGTH_3] ={ 0x09,0x00,0x00 };
 static uint8_t wr_buffer_status_pointer[BUF_LENGTH_3] = {0x05,0x00,0x00};
 	
 //Control States
-enum control_states{ IDEAL_STATE = 0, NEXT_BUTTON_PRESSED=1, RECORD_BUTTON_PRESSED=2, PLAY_BUTTON_PRESSED=3,N_P_PRESSED = 4,ALL_BUTTONS_PRESSED = 7}; 
+enum control_states{ IDEAL_STATE = 0x1400, NEXT_BUTTON_PRESSED=1, RECORD_BUTTON_PRESSED=2, PLAY_BUTTON_PRESSED=3,N_P_PRESSED = 4,ALL_BUTTONS_PRESSED = 7}; 
 
 
 extern volatile uint8_t track_pointer; 
 extern volatile bool interrupt_occured;
 
 
-
+void burp_box_erase(uint8_t track_no);
+void burp_box_record(uint8_t track_no);
+void burp_box_play(uint8_t track_no);
+void spi_write_stop();
+void spi_write_apc(uint8_t* write_apc);
 void init_burp_box();
 void spi_main_loop_1(uint16_t input_buttons_servo);

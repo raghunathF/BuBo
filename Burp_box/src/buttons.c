@@ -67,7 +67,7 @@ void config_extint_channel_burp_box()
 void clear_interrupts_flags()
 {
 	uint8_t* write_clear_interrupts_flags = EXTINT_FLAG_STATUS;
-	uint8_t  write_clear_flags = 0xFF;
+	uint8_t  write_clear_flags = BUTTONS_INTERRUPT_MASK;
 	*write_clear_interrupts_flags = write_clear_flags;
 }
 
@@ -85,8 +85,9 @@ void play_pressed_callback()
 {
 	//check what all interrupt flags are high
 	uint8_t read_status = 0;
-	delay_cycles_ms(DEBOUNCE_DELAY);
+	//delay_cycles_ms(DEBOUNCE_DELAY);
 	read_status = read_interrupt_flag_status();
+	read_status = read_status & BUTTONS_INTERRUPT_MASK; //0x12
 	switch(read_status)
 	{
 		case PLAY_BUTTON_CLICKED:
@@ -139,8 +140,9 @@ void next_pressed_callback()
 {
 	//check what all interrupt flags are high
 	uint8_t read_status = 0;
-	delay_cycles_ms(DEBOUNCE_DELAY);
+	//delay_cycles_ms(DEBOUNCE_DELAY);
 	read_status = read_interrupt_flag_status();
+	read_status = read_status & BUTTONS_INTERRUPT_MASK;
 	
 	switch(read_status)
 	{

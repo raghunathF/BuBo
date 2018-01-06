@@ -8,6 +8,7 @@
 #include "main_control.h"
 #include "spi_control.h"
 #include "bsp.h"
+#include "PWM_capture.h"
 
 void main_control_loop_1()
 {
@@ -18,8 +19,14 @@ void main_control_loop_1()
 	//enum buttons_state button_input;
 	
 	//Servo input -- here
+	servo_input  = get_servo_command();
+	servo_input  = servo_input << 8;
 	button_input  = check_input_buttons();
-	overall_input = input_buttons | button_input ;//|| servo_input ;
+	overall_input = input_buttons | button_input ;
+	if(overall_input == 0 )
+	{
+		overall_input = input_buttons | button_input | servo_input ;
+	}
 	input_buttons = 0;
 	spi_main_loop_1(overall_input); 
 

@@ -13,5 +13,8 @@
 void test_track_led();
 void test_led_on_off_toggle();
 void test_buttons();
+void test_volume_func();
+void test_record_func();
+void test_speaker_func();
 
 #endif /* TEST_H_ */

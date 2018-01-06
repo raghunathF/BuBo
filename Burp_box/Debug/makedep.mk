@@ -2,11 +2,19 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+src\ASF\sam0\drivers\events\events_hooks.c
+
+src\ASF\sam0\drivers\events\events_sam_d_r_h\events.c
+
 src\ASF\sam0\drivers\extint\extint_callback.c
 
 src\ASF\sam0\drivers\extint\extint_sam_d_r_h\extint.c
 
 src\buttons.c
+
+src\prog_test.c
+
+src\PWM_capture.c
 
 src\PWM_capture_control.c
 

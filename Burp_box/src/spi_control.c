@@ -9,6 +9,7 @@
 #include "spi_master.h"
 #include "delay.h"
 #include "bsp.h"
+#include "PWM_capture_control.h"
 
 void spi_write_global_erase()
 {
@@ -62,6 +63,7 @@ void init_burp_box()
 	//Choose input
 	spi_write_apc(wr_apc_2_ideal); //Volume init -- High 
 	delay_spi();	
+
 	
 	//trackpointer -- Initialized to one
 	track_pointer = 1;
@@ -115,7 +117,7 @@ void wait_burp_box(uint8_t operation)
 
 void burp_box_record(uint8_t track_no)
 {
-	
+	LED_on(RECORD_LED);
 	switch (track_no)
 	{
 		case TRACK_NO_1:	
@@ -136,15 +138,17 @@ void burp_box_record(uint8_t track_no)
 		default:
 			break;
 	}
-	//Wait till the operation is complete
 	
+	//Wait till the operation is complete
 	//wait_burp_box_2();
 	wait_burp_box(RECORD_OPERATION);
-	
+	spi_write_apc(wr_apc_2_ideal);
+	LED_off(RECORD_LED);
 }
 
 void burp_box_erase(uint8_t track_no)
 {
+	spi_write_stop();
 	switch(track_no)
 	{
 		case TRACK_NO_1:
@@ -164,6 +168,7 @@ void burp_box_erase(uint8_t track_no)
 	}
 	//wait_burp_box_2();
 	wait_burp_box(ERASE_OPERATION);
+	spi_write_stop();
 	//delay_cycles_ms(300);
 }
 
@@ -171,6 +176,7 @@ void burp_box_play(uint8_t track_no)
 {
 	//time_out = false;
 	//Clear interrupts
+	LED_on(PLAY_LED);
 	spi_write_clear_int();
 	switch (track_no)
 	{
@@ -198,9 +204,8 @@ void burp_box_play(uint8_t track_no)
 	//Wait till the operation is complete
 	//LED_on(PLAY_LED);
 	wait_burp_box(PLAY_OPERATION);
+	LED_off(PLAY_LED);
 }
-
-
 
 
 
@@ -253,28 +258,24 @@ void spi_main_loop_1(uint16_t input_buttons_servo)
 {
 	switch (input_buttons_servo)
 	{	
-		case IDEAL_STATE:
-			break;
 		
 		case PLAY_BUTTON_PRESSED:
 			spi_write_stop();
-			LED_on(PLAY_LED);
+			//LED_on(PLAY_LED);
 			spi_write_apc(wr_apc_2_play_memory);
 			spi_write_clear_int();
 			burp_box_play(track_pointer);
-			LED_off(PLAY_LED);
+			//LED_off(PLAY_LED);
 			spi_write_apc(wr_apc_2_ideal);
 			interrupt_occured = false;
 			break;
 			
 		case RECORD_BUTTON_PRESSED:
-			spi_write_stop();
 			burp_box_erase(track_pointer);
-			spi_write_stop();
-			LED_on(RECORD_LED);
+			//LED_on(RECORD_LED);
 			spi_write_apc(wr_apc_2_record_mic);
 			burp_box_record(track_pointer);
-			LED_off(RECORD_LED);
+			//LED_off(RECORD_LED);
 			spi_write_apc(wr_apc_2_ideal);
 			interrupt_occured = false;
 			break;
@@ -296,39 +297,59 @@ void spi_main_loop_1(uint16_t input_buttons_servo)
 			global_erase_LED_flashing();
 			LED_track(track_pointer-1);
 			interrupt_occured = false;
+			break;
+		case FUTURE_USE:
+			break;
+		case TRACK_1_VOLUME_1:
+			burp_box_set_volume_track(VOLUME_1,TRACK_1);
+			break;
+		case TRACK_1_VOLUME_2:
+			burp_box_set_volume_track(VOLUME_3,TRACK_1);
+			break;
+		case TRACK_1_VOLUME_3:
+			burp_box_set_volume_track(VOLUME_5,TRACK_1);
+			break;
+		case TRACK_2_VOLUME_1:
+			burp_box_set_volume_track(VOLUME_1,TRACK_2);
+			break;
+		case TRACK_2_VOLUME_2:
+			burp_box_set_volume_track(VOLUME_3,TRACK_2);
+			break;
+		case TRACK_2_VOLUME_3:
+			burp_box_set_volume_track(VOLUME_5,TRACK_2);
+			break;
+		case TRACK_3_VOLUME_1:
+			burp_box_set_volume_track(VOLUME_1,TRACK_3);
+			break;
+		case TRACK_3_VOLUME_2:
+			burp_box_set_volume_track(VOLUME_3,TRACK_3);
+			break;
+		case TRACK_3_VOLUME_3:
+			burp_box_set_volume_track(VOLUME_5,TRACK_3);
+			break;
+		case TRACK_1_RECORD_MIC:
+			break;
+		case TRACK_1_RECORD_ANAIN:
+			break;
+		case TRACK_2_RECORD_MIC:
+			break;
+		case TRACK_2_RECORD_ANAIN:
+			break;
+		case TRACK_3_RECORD_MIC:
+			break;
+		case TRACK_3_RECORD_ANAIN:
+			break;
+		case FT_MIC:
+			break;
+		case FT_ANAIN:
+			break;
+		case REPEAT_HELP:
+			break;
+		case UNDEFINED:
+			break;
+		
 		default:
 			break;
 	}
 }
 
-void change_volume(uint8_t volume)
-{
-
-	switch (volume)
-	{
-		case VOLUME_1:
-		spi_write_apc(wr_apc_2_volume_1);
-		break;
-		case VOLUME_2:
-		spi_write_stop();
-		spi_write_apc(wr_apc_2_volume_2);
-		break;
-		case VOLUME_3:
-		spi_write_apc(wr_apc_2_volume_3);
-		break;
-		case VOLUME_4:
-		spi_write_apc(wr_apc_2_volume_4);
-		break;
-		case VOLUME_5:
-		spi_write_apc(wr_apc_2_volume_5);
-		break;
-		default:
-		break;
-	}
-}
-
-void burp_box_set_volume_track(uint8_t volume,uint8_t track_no)
-{
-	change_volume(volume);
-	burp_box_play(track_no);
-}

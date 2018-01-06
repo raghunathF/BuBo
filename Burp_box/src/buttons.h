@@ -9,6 +9,9 @@
 #ifndef BUTTONS_H_
 #define BUTTONS_H_
 
+#define BUTTONS_INTERRUPT_MASK 0x12 ;
+
+
 //--Play
 #define PLAY_BUTTON_EIC           PIN_PA04A_EIC_EXTINT4
 #define PLAY_BUTTON_MUX           PINMUX_PA04A_EIC_EXTINT4
@@ -31,6 +34,7 @@
 #define NEXT_BUTTON_CLICKED       0x02
 #define ALL_BUTTONS_CLICKED       0x12
 
+#define MASK_BUTTONS 0x0000
 extern volatile uint8_t input_buttons;
 extern volatile bool interrupt_occured;
 

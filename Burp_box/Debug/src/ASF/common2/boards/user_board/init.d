@@ -104,6 +104,10 @@ src/ASF/common2/boards/user_board/init.d \
  ../src/ASF/sam0/drivers/system/clock/clock.h \
  ../src/ASF/sam0/drivers/system/clock/gclk.h \
  ../src/ASF/sam0/drivers/system/clock/clock_samd09_d10_d11/clock_feature.h \
+ ../src/ASF/sam0/drivers/events/events.h \
+ ../src/ASF/sam0/drivers/events/events_common.h \
+ ../src/ASF/sam0/drivers/events/events_hooks.h \
+ ../src/ASF/sam0/drivers/events/events.h \
  ../src/ASF/sam0/drivers/extint/extint.h \
  ../src/ASF/sam0/drivers/system/pinmux/pinmux.h \
  ../src/ASF/sam0/drivers/extint/extint_callback.h \
@@ -341,6 +345,14 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 ../src/ASF/sam0/drivers/system/clock/gclk.h:
 
 ../src/ASF/sam0/drivers/system/clock/clock_samd09_d10_d11/clock_feature.h:
+
+../src/ASF/sam0/drivers/events/events.h:
+
+../src/ASF/sam0/drivers/events/events_common.h:
+
+../src/ASF/sam0/drivers/events/events_hooks.h:
+
+../src/ASF/sam0/drivers/events/events.h:
 
 ../src/ASF/sam0/drivers/extint/extint.h:
 

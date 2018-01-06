@@ -102,6 +102,10 @@ src/main.d src/main.o: ../src/main.c ../src/asf.h \
  ../src/ASF/sam0/drivers/system/clock/clock.h \
  ../src/ASF/sam0/drivers/system/clock/gclk.h \
  ../src/ASF/sam0/drivers/system/clock/clock_samd09_d10_d11/clock_feature.h \
+ ../src/ASF/sam0/drivers/events/events.h \
+ ../src/ASF/sam0/drivers/events/events_common.h \
+ ../src/ASF/sam0/drivers/events/events_hooks.h \
+ ../src/ASF/sam0/drivers/events/events.h \
  ../src/ASF/sam0/drivers/extint/extint.h \
  ../src/ASF/sam0/drivers/system/pinmux/pinmux.h \
  ../src/ASF/sam0/drivers/extint/extint_callback.h \
@@ -128,7 +132,7 @@ src/main.d src/main.o: ../src/main.c ../src/asf.h \
  ../src/ASF/sam0/drivers/tcc/tcc_callback.h \
  ../src/ASF/sam0/drivers/tcc/tcc.h ../src/pinout.h ../src/spi_master.h \
  ../src/bsp.h ../src/test.h ../src/spi_control.h ../src/buttons.h \
- ../src/main_control.h
+ ../src/main_control.h ../src/PWM_capture.h ../src/prog_test.h
 
 ../src/asf.h:
 
@@ -342,6 +346,14 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 
 ../src/ASF/sam0/drivers/system/clock/clock_samd09_d10_d11/clock_feature.h:
 
+../src/ASF/sam0/drivers/events/events.h:
+
+../src/ASF/sam0/drivers/events/events_common.h:
+
+../src/ASF/sam0/drivers/events/events_hooks.h:
+
+../src/ASF/sam0/drivers/events/events.h:
+
 ../src/ASF/sam0/drivers/extint/extint.h:
 
 ../src/ASF/sam0/drivers/system/pinmux/pinmux.h:
@@ -411,3 +423,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 ../src/buttons.h:
 
 ../src/main_control.h:
+
+../src/PWM_capture.h:
+
+../src/prog_test.h:

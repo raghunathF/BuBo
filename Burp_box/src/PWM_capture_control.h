@@ -17,8 +17,13 @@
 #define VOLUME_4		4
 #define VOLUME_5		5
 
-void burp_box_set_volume_track(uint8_t volume,uint8_t track_no);
+#define MIC             1
+#define ANALOG_IN       2
 
+extern volatile uint8_t track_pointer;
+void burp_box_set_speaker(uint8_t input);
+void burp_box_set_record_input(uint8_t rec_mode,uint8_t track_no);
+void burp_box_set_volume_track(uint8_t volume,uint8_t track_no);
 
 
 #endif /* PWM_CAPTURE_CONTROL_H_ */
